@@ -1,6 +1,7 @@
 #include "simpleHttpServer.h"
 #include <iostream>
 #include <sstream>
+#include <unistd.h>
 
 namespace {
 void log(const std::string &message) { std::cout << message << std::endl; }
@@ -22,5 +23,41 @@ TcpServer::TcpServer(std::string ip_address, int port)
        << ntohs(m_socket_address.sin_port);
     log(ss.str());
   }
+}
+
+TcpServer::~TcpServer() {
+  close(m_socket);
+  close(m_new_socket);
+  exit(0);
+}
+
+void TcpServer::start_listen() {
+  if (listen(m_socket, 20) < 0) {
+    exit_with_error("Socket listen failed.");
+  }
+
+  std::ostringstream ss;
+  ss << "\n*** Listening on ADDRESS: " << inet_ntoa(m_socket_address.sin_addr)
+     << " PORT: " << ntohs(m_socket_address.sin_port) << " ***\n\n";
+  log(ss.str());
+  int bytes_received = 0;
+
+  while (true) {
+    log("===== Waiting for new connection =====\n\n\n");
+    accept_connection(m_new_socket);
+
+    char buffer[BUFFER_SIZE] = {0};
+    bytes_received = read(m_new_socket, buffer, BUFFER_SIZE);
+    if (bytes_received < 0) {
+      exit_with_error("Failed to receive bytes from client socket connection");
+    }
+    std::ostringstream ss;
+    ss << "------ Received bytes from client ------\n\n";
+    log(ss.str());
+  }
+
+  send_response();
+
+  close(m_new_socket);
 }
 } // namespace server
