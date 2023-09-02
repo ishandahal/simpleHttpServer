@@ -5,6 +5,10 @@
 
 namespace {
 void log(const std::string &message) { std::cout << message << std::endl; }
+void exit_with_error(const std::string &error_msg) {
+  log("Error: " + error_msg);
+  exit(1);
+}
 } // namespace
 
 namespace server {
@@ -25,6 +29,7 @@ TcpServer::TcpServer(std::string ip_address, int port)
   }
 }
 
+<<<<<<< HEAD
 TcpServer::~TcpServer() {
   close(m_socket);
   close(m_new_socket);
@@ -59,5 +64,20 @@ void TcpServer::start_listen() {
   send_response();
 
   close(m_new_socket);
+}
+
+int TcpServer::start_server() {
+  m_socket = socket(
+      AF_INET, SOCK_STREAM,
+      0); // AF_INET for ipv4, SOCK_STREAM for reliable full_duples byte stream
+  if (m_socket < 0) {
+    exit_with_error("Cannot create socket.");
+    return 1;
+  }
+  if (bind(m_socket, (sockaddr *)&m_socket_address, m_socket_address_len) < 0) {
+    exit_with_error("Cannot connect socket with address.");
+    return 1;
+  }
+  return 0;
 }
 } // namespace server
