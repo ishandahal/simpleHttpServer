@@ -10,7 +10,7 @@ namespace server {
 
 class TcpServer {
 public:
-  TcpServer();
+  TcpServer(std::string ip_address, int port);
   ~TcpServer();
   void start_listen();
 
