@@ -1,3 +1,3 @@
-./server
-./server.o
-./simpleHttpServer.o
+server
+server.o
+simpleHttpServer.o
