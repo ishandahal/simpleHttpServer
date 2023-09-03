@@ -14,10 +14,9 @@ void exit_with_error(const std::string &error_msg) {
 
 namespace server {
 TcpServer::TcpServer(std::string ip_address, int port)
-    : m_ip_address(ip_address), m_port(port), m_socket(), m_new_socket(),
-      m_incoming_message(), m_socket_address(),
-      m_socket_address_len(sizeof(m_socket_address)),
-      m_server_message(build_response()) {
+    : m_ip_address(ip_address), m_server_message(build_response()),
+      m_port(port), m_socket(), m_new_socket(), m_incoming_message(),
+      m_socket_address(), m_socket_address_len(sizeof(m_socket_address)) {
   m_socket_address.sin_family = AF_INET;
   m_socket_address.sin_port = htons(m_port);
   m_socket_address.sin_addr.s_addr = inet_addr(m_ip_address.c_str());
@@ -59,11 +58,11 @@ void TcpServer::start_listen() {
     std::ostringstream ss;
     ss << "------ Received bytes from client ------\n\n";
     log(ss.str());
+
+    send_response();
+
+    close(m_new_socket);
   }
-
-  send_response();
-
-  close(m_new_socket);
 }
 
 int TcpServer::start_server() {
